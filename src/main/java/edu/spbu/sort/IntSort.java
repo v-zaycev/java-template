@@ -40,8 +40,21 @@ public class IntSort
     merge(array,array_copy,0,array.length-1);
   }
 
-  public static void sort (List<Integer> list) {
-    Collections.sort(list);
+  public static void sort (List<Integer> list)
+  {
+    int list_size = list.size();
+    int[] main_array, copy_array;
+    main_array = new int[list_size];
+    copy_array = new int[list_size];
+    for (int i=0;i<list_size;i++)
+    {
+      copy_array[i]=list.get(i);
+      main_array[i]=list.get(i);
+    }
+    merge(main_array,copy_array,0,list_size-1);
+    list.clear();
+    for (int i:main_array)
+      list.add(i);
   }
 
 /*  public static void main (String[] args)
