@@ -27,6 +27,7 @@ public class IntSort
         main_array[k++]=copy_array[i++];
       while (j<=right)
         main_array[k++]=copy_array[j++];
+
       for (int a=left;a<right+1;a++)
       {
         copy_array[a]=main_array[a];
