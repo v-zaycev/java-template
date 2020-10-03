@@ -1,16 +1,54 @@
 package edu.spbu.matrix;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
 /**
  * Плотная матрица
  */
 public class DenseMatrix implements Matrix
 {
+  double[][] matrix;
+  int lines, columns;
   /**
    * загружает матрицу из файла
    * @param fileName
    */
-  public DenseMatrix(String fileName) {
+  public DenseMatrix(String fileName) throws Exception
+  {
+    BufferedReader reader = new BufferedReader (new FileReader(fileName));
+    String s;
+    ArrayList<double[]> matrix= new ArrayList<double[]>();
+    double[] current_string;
+    int i=0;
 
+    while (reader.ready())
+    {
+      s=reader.readLine();
+      String[] elements=s.split(" ");
+      current_string=new double[elements.length];
+      for(int j=0;j<elements.length;j++)
+        current_string[j]=Double.parseDouble(elements[j]);
+      matrix.add(current_string);
+      i++;
+    }
+
+    lines=i;
+    columns= matrix.get(0).length;
+    this.matrix=new double[i][];
+    for (int j=0;j< matrix.size();j++)
+      this.matrix[j]=matrix.get(j);
+    reader.close();
+  }
+
+
+  public DenseMatrix(int lines, int columns)
+  {
+    this.lines=lines;
+    this.columns=columns;
+    this.matrix=new double[lines][columns];
   }
   /**
    * однопоточное умнджение матриц
@@ -21,7 +59,16 @@ public class DenseMatrix implements Matrix
    */
   @Override public Matrix mul(Matrix o)
   {
-    return null;
+    if (getClass()!=o.getClass()||lines!=((DenseMatrix) o).columns)
+      return null;
+
+    DenseMatrix matrix=new DenseMatrix(lines, ((DenseMatrix) o).columns);
+    for(int i=0;i<matrix.lines;i++)
+      for(int j=0;j<matrix.columns;j++)
+        for (int k=0;k<columns;k++)
+          matrix.matrix[i][j]+=this.matrix[i][k]*((DenseMatrix) o).matrix[k][j];
+
+    return matrix;
   }
 
   /**
@@ -40,8 +87,47 @@ public class DenseMatrix implements Matrix
    * @param o
    * @return
    */
-  @Override public boolean equals(Object o) {
-    return false;
+  @Override public boolean equals(Object o)
+  {
+    if (this==o)
+      return true;
+    if (getClass()!=o.getClass())
+      return false;
+
+    if (lines!=((DenseMatrix) o).lines||columns!=((DenseMatrix) o).columns)
+      return false;
+
+    for (int i=0;i<lines;i++)
+      for(int j=0;j<columns;j++)
+        if (matrix[i][j]!=((DenseMatrix) o).matrix[i][j])
+          return false;
+
+    return true;
   }
 
+  @Override public String toString()
+  {
+    DecimalFormat format = new DecimalFormat("#");
+    String s= new String();
+    for (double[] i:matrix)
+    {
+      for (double j : i)
+      {
+        if (j-(int)j==0)
+          s=s.concat(format.format(j)+" ");
+        else
+          s=s.concat(j+" ");
+      }
+      s=s.substring(0,s.length()-1).concat("\n");
+    }
+    s=s.substring(0,s.length()-1);
+        return s;
+  }
+
+  public static void main (String[] args) throws Exception
+  {
+    DenseMatrix m1= new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
+    DenseMatrix m2= new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m2.txt");
+    System.out.println(m1.mul(m2).toString());
+  }
 }
