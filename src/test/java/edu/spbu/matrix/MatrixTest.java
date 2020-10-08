@@ -13,7 +13,7 @@ public class MatrixTest
   /**
    * ожидается 4 таких теста
    */
-  @Test
+/*  @Test
   public void test_toString() throws Exception
   {
     Matrix m1 = new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
@@ -22,6 +22,32 @@ public class MatrixTest
     String s = new String();
     while (reader.ready())
       s=s.concat(reader.readLine()+"\n");
+    s=s.substring(0,s.length()-1);
+    assertEquals(s,m1.toString());
+  }*/
+
+  @Test
+  public void test_toString() throws Exception
+  {
+    Matrix m1 = new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
+
+    BufferedReader reader = new BufferedReader (new FileReader(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt"));
+    String s = new String(),line;
+    while (reader.ready())
+    {
+      line=reader.readLine();
+      boolean flag=false;
+      char[] str=line.toCharArray();
+      for (int i=0;i<str.length;i++)
+        if(str[i]!=' '||i+1<str.length&&str[i]==' '&&str[i+1]!=' ')
+        {
+          s=s.concat(String.valueOf(str[i]));
+          flag=true;
+        }
+
+      if (flag)
+        s=s.concat("\n");
+    }
     s=s.substring(0,s.length()-1);
     assertEquals(s,m1.toString());
   }

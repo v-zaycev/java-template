@@ -16,6 +16,7 @@ public class DenseMatrix implements Matrix
    * загружает матрицу из файла
    * @param fileName
    */
+  /*
   public DenseMatrix(String fileName) throws Exception
   {
     BufferedReader reader = new BufferedReader (new FileReader(fileName));
@@ -33,6 +34,55 @@ public class DenseMatrix implements Matrix
         current_string[j]=Double.parseDouble(elements[j]);
       matrix.add(current_string);
       i++;
+    }
+
+    lines=i;
+    columns= matrix.get(0).length;
+    this.matrix=new double[i][];
+    for (int j=0;j< matrix.size();j++)
+      this.matrix[j]=matrix.get(j);
+    reader.close();
+  }
+  */
+
+  public DenseMatrix(String fileName) throws Exception
+  {
+    BufferedReader reader = new BufferedReader (new FileReader(fileName));
+    String s, number= new String();
+    ArrayList<String> elements;
+    ArrayList<double[]> matrix= new ArrayList<double[]>();
+    double[] current_string;
+    int i=0;
+
+    while (reader.ready())
+    {
+      s=reader.readLine();
+      elements=new ArrayList<String>();
+      char[] str=s.toCharArray();
+      for (char j: str)
+      {
+        if (j!=' ')
+          number=number.concat(String.valueOf(j));
+        else
+          if (number.length()>0)
+          {
+            elements.add(number);
+            number=new String();
+          }
+      }
+      if (number.length()>0)
+      {
+        elements.add(number);
+        number=new String();
+      }
+      if (elements.size()>0)
+      {
+        current_string=new double[elements.size()];
+        for(int j=0;j<elements.size();j++)
+          current_string[j]=Double.parseDouble(elements.get(j));
+        matrix.add(current_string);
+        i++;
+      }
     }
 
     lines=i;
