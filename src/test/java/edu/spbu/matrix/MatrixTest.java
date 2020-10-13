@@ -26,7 +26,7 @@ public class MatrixTest
     assertEquals(s,m1.toString());
   }*/
 
-  @Test
+/*  @Test
   public void test_toString() throws Exception
   {
     Matrix m1 = new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
@@ -50,6 +50,41 @@ public class MatrixTest
     }
     s=s.substring(0,s.length()-1);
     assertEquals(s,m1.toString());
+  }*/
+  @Test
+  public void test_constructor() throws Exception
+  {
+    DenseMatrix m1= new DenseMatrix();
+    m1.lines=5;
+    m1.columns=7;
+    m1.matrix= new double[][]{{1, 5, 76, 4, 19, -25, 31},
+                              {23, 7, 29, 64, 91, 55, 23},
+                              {8, 1, 84, 0, 47, 2, 1},
+                              {16, -73, 57, 6, 1, 58, 3},
+                              {43, 0, -5, -6, 12, 0, -26}};
+    Matrix m2= new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
+    assertEquals(m1,m2);
+  }
+
+  @Test
+  public void test_toString() throws Exception
+  {
+    Matrix m1 = new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt"),
+           m2 = new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m2.txt");
+    String s= "1 5 76 4 19 -25 31\n" +
+              "23 7 29 64 91 55 23\n" +
+              "8 1 84 0 47 2 1\n" +
+              "16 -73 57 6 1 58 3\n" +
+              "43 0 -5 -6 12 0 -26";
+    assertEquals(s,m1.toString());
+    s="6 7 0 22 50\n" +
+      "0 92 -1 14 11\n" +
+      "-32 57 0 77 3\n" +
+      "2 1 34 37 65\n" +
+      "9 5 4 86 0\n" +
+      "-7 93 2 4 1\n" +
+      "0 -8 13 -41 1";
+    assertEquals(s,m2.toString());
   }
 
   @Test

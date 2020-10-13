@@ -100,6 +100,8 @@ public class DenseMatrix implements Matrix
     this.columns=columns;
     this.matrix=new double[lines][columns];
   }
+
+  public DenseMatrix () {}
   /**
    * однопоточное умнджение матриц
    * должно поддерживаться для всех 4-х вариантов

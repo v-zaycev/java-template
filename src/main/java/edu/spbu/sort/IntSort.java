@@ -58,11 +58,11 @@ public class IntSort
       list.add(i);
   }
 
-/*  public static void main (String[] args)
+  public static void main (String[] args)
   {
     int[] array={1,7,3,54,6,2,4,7,9,41,12, 57,11};
     sort(array);
     for (int j : array) System.out.print(j+" ");
-  }*/
+  }
 }
 
