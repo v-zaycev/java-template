@@ -114,11 +114,16 @@ public class DenseMatrix implements Matrix
     if (getClass()!=o.getClass()||lines!=((DenseMatrix) o).columns)
       return null;
 
+    double[][] transposed = new double[((DenseMatrix) o).columns][((DenseMatrix) o).lines];
+    for(int i=0;i<((DenseMatrix) o).lines;i++)
+      for(int j=0;j<((DenseMatrix) o).columns;j++)
+        transposed[j][i]=((DenseMatrix) o).matrix[i][j];
+
     DenseMatrix matrix=new DenseMatrix(lines, ((DenseMatrix) o).columns);
     for(int i=0;i<matrix.lines;i++)
       for(int j=0;j<matrix.columns;j++)
         for (int k=0;k<columns;k++)
-          matrix.matrix[i][j]+=this.matrix[i][k]*((DenseMatrix) o).matrix[k][j];
+          matrix.matrix[i][j]+=this.matrix[i][k]*transposed[j][k];
 
     return matrix;
   }
