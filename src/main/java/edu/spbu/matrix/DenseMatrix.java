@@ -111,16 +111,39 @@ public class DenseMatrix implements Matrix
    */
   @Override public Matrix mul(Matrix o)
   {
-    if (getClass()!=o.getClass()||lines!=((DenseMatrix) o).columns)
-      return null;
+    if (o instanceof DenseMatrix)
+    {
+      if (lines!=((DenseMatrix) o).columns)
+        return null;
 
-    DenseMatrix matrix=new DenseMatrix(lines, ((DenseMatrix) o).columns);
-    for(int i=0;i<matrix.lines;i++)
-      for(int j=0;j<matrix.columns;j++)
-        for (int k=0;k<columns;k++)
-          matrix.matrix[i][j]+=this.matrix[i][k]*((DenseMatrix) o).matrix[k][j];
+      DenseMatrix matrix=new DenseMatrix(lines, ((DenseMatrix) o).columns);
+      for(int i=0;i<lines;i++)
+        for(int j=0;j<columns;j++)
+          for (int k=0;k<((DenseMatrix) o).columns;k++)
+            matrix.matrix[i][k]+=this.matrix[i][j]*((DenseMatrix) o).matrix[j][k];
 
-    return matrix;
+      return matrix;
+    }
+    if (o instanceof SparseMatrix)
+    {
+      if (lines!=((SparseMatrix) o).columns)
+        return null;
+
+      DenseMatrix matrix=new DenseMatrix(lines, ((SparseMatrix) o).columns);
+
+      int k=0;
+      for (int i=0;i<lines;i++)
+        for (int j=0;j<columns;j++)
+          if (this.matrix[i][j]!=0)
+          {
+            k=((SparseMatrix) o).line_begin_indexes[j];
+            while(j+1<((SparseMatrix) o).line_begin_indexes.length&&k<((SparseMatrix) o).line_begin_indexes[j+1]||j+1==((SparseMatrix) o).line_begin_indexes.length&&k<((SparseMatrix) o).values.length)
+              matrix.matrix[i][((SparseMatrix) o).val_columns[k]]+=((SparseMatrix) o).values[k++]*this.matrix[i][j];
+          }
+      return matrix;
+    }
+
+    return null;
   }
 
   /**
@@ -143,18 +166,21 @@ public class DenseMatrix implements Matrix
   {
     if (this==o)
       return true;
-    if (getClass()!=o.getClass())
-      return false;
+    if (o instanceof DenseMatrix)
+    {
+      if (lines!=((DenseMatrix) o).lines||columns!=((DenseMatrix) o).columns)
+        return false;
 
-    if (lines!=((DenseMatrix) o).lines||columns!=((DenseMatrix) o).columns)
-      return false;
+      for (int i=0;i<lines;i++)
+        for(int j=0;j<columns;j++)
+          if (matrix[i][j]!=((DenseMatrix) o).matrix[i][j])
+            return false;
 
-    for (int i=0;i<lines;i++)
-      for(int j=0;j<columns;j++)
-        if (matrix[i][j]!=((DenseMatrix) o).matrix[i][j])
-          return false;
-
-    return true;
+      return true;
+    }
+    if (o instanceof SparseMatrix)
+      return o.equals(this);
+    return false;
   }
 
   @Override public String toString()
