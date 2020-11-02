@@ -106,9 +106,9 @@ public class SparseMatrix implements Matrix
       if(((SparseMatrix) o).lines==this.columns)
       {
         DenseMatrix mult_res=new DenseMatrix(lines,((SparseMatrix) o).columns);
-        SparseMatrix transposed= new SparseMatrix(((SparseMatrix) o).columns, ((SparseMatrix)o).lines, ((SparseMatrix)o).values.length);
-        int[] vector = new int[transposed.columns+1];
-        int k=0;
+     //   SparseMatrix transposed= new SparseMatrix(((SparseMatrix) o).columns, ((SparseMatrix)o).lines, ((SparseMatrix)o).values.length);
+     //   int[] vector = new int[transposed.columns+1];
+        int k;
 
      /*   //транспонируем вторую матрицу
         for (int i=0;i<transposed.val_columns.length;i++) //подсчёт не 0 в столбцах
@@ -146,7 +146,7 @@ public class SparseMatrix implements Matrix
       if(((DenseMatrix) o).lines==columns)
       {
         DenseMatrix mult_res=new DenseMatrix(lines,((DenseMatrix) o).columns);
-        DenseMatrix transposed = new DenseMatrix(((DenseMatrix) o).columns, ((DenseMatrix) o).lines);
+      //  DenseMatrix transposed = new DenseMatrix(((DenseMatrix) o).columns, ((DenseMatrix) o).lines);
 
         int k=0;
 
