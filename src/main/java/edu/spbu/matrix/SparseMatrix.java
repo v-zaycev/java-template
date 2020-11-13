@@ -4,16 +4,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
 /**
  * Разряженная матрица
  */
 
 public class SparseMatrix implements Matrix
 {
-  double[] values; //вектор всех значений в порядке строк
-  int[] val_columns;//вектор соответствия значений столбцам
+  double values[];
+  int val_columns[];
   int lines, columns;
-  int[] line_begin_indexes; //индексы начал строк в общем векторе
+  int line_begin_indexes[];
   /**
    * загружает матрицу из файла
    * @param fileName
@@ -21,74 +22,41 @@ public class SparseMatrix implements Matrix
   public SparseMatrix(String fileName) throws Exception
   {
     BufferedReader reader = new BufferedReader (new FileReader(fileName));
-    String s, number= new String();
-    ArrayList<String> elements;
-    ArrayList<double[]> matrix= new ArrayList<>();
-    double[] current_string;
-    int i=0,n=0;
-
+    String s, values[];
+    ArrayList<Double>values_d= new ArrayList<>();
+    ArrayList<Integer>val_columns = new ArrayList<>();
+    ArrayList<Integer>line_begin_indexes=new ArrayList<>();
+    int k;
+    line_begin_indexes.add(0);
     while (reader.ready())
     {
       s=reader.readLine();
-      elements=new ArrayList<>();
-      char[] str=s.toCharArray();
-      for (char j: str)
+      values=s.split(" ");
+      k=0;
+      for (String i:values)
       {
-        if (j!=' ')
-          number=number.concat(String.valueOf(j));
-        else
-        if (number.length()>0)
+        if (Double.parseDouble(i)!=0)
         {
-          elements.add(number);
-          number=new String();
+          values_d.add(Double.parseDouble(i));
+          val_columns.add(k);
         }
+        k++;
       }
-      if (number.length()>0)
-      {
-        elements.add(number);
-        number=new String();
-      }
-      if (elements.size()>0)
-      {
-        current_string=new double[elements.size()];
-        for(int j=0;j<elements.size();j++)
-        {
-          current_string[j]=Double.parseDouble(elements.get(j));
-          if (current_string[j]!=0)
-            n++;
-        }
-        matrix.add(current_string);
-        i++;
-      }
+      line_begin_indexes.add(values_d.size());
+      columns=values.length;
+      lines++;
     }
-
-    lines=i;
-    columns= matrix.get(0).length;
-    line_begin_indexes=new int[lines];
-    values= new double[n];
-    val_columns= new int[n];
-    n=0;
-    for (int j=0;j<lines;j++)
+    this.values=new double[values_d.size()];
+    this.val_columns=new int[values_d.size()];
+    this.line_begin_indexes= new int[line_begin_indexes.size()];
+    for (int i=0;i<values_d.size();i++)
     {
-      line_begin_indexes[j]=n;
-      for (int k=0;k<columns;k++)
-        if (matrix.get(j)[k]!=0)
-        {
-          values[n]=matrix.get(j)[k];
-          val_columns[n]=k;
-          n++;
-        }
+      this.values[i]=values_d.get(i);
+      this.val_columns[i]=val_columns.get(i);
     }
+    for (int i=0;i<lines+1;i++)
+      this.line_begin_indexes[i]=line_begin_indexes.get(i);
 
-  }
-
-  public SparseMatrix(int lines, int columns, int nonzero)
-  {
-    this.lines=lines;
-    this.columns=columns;
-    values= new double[nonzero];
-    val_columns= new int[nonzero];
-    line_begin_indexes = new int[lines];
   }
 
   public SparseMatrix(){}
@@ -103,38 +71,20 @@ public class SparseMatrix implements Matrix
   {
     if (o instanceof SparseMatrix)
     {
-      if(((SparseMatrix) o).lines==this.columns)
+        SparseMatrix so= (SparseMatrix)o;
+      if(so.lines==this.columns)
       {
-        DenseMatrix mult_res=new DenseMatrix(lines,((SparseMatrix) o).columns);
-     //   SparseMatrix transposed= new SparseMatrix(((SparseMatrix) o).columns, ((SparseMatrix)o).lines, ((SparseMatrix)o).values.length);
-     //   int[] vector = new int[transposed.columns+1];
-        int k;
+        DenseMatrix mult_res=new DenseMatrix(lines,so.columns);
 
-     /*   //транспонируем вторую матрицу
-        for (int i=0;i<transposed.val_columns.length;i++) //подсчёт не 0 в столбцах
-          vector[((SparseMatrix) o).val_columns[i]+1]++;
-        for (int i=1;i<transposed.lines;i++) //определение начал столбцов в векторе значений
-        {
-          transposed.line_begin_indexes[i]=transposed.line_begin_indexes[i-1]+vector[i];
-          vector[i]=0;
-        }
-        for (int i=0;i<((SparseMatrix)o).values.length;i++)  //перевод значений из строкового представления в столбцовое
-        {
-          if (k+1<((SparseMatrix)o).lines&&i==((SparseMatrix)o).line_begin_indexes[k+1])
-            k++;
-          transposed.values[transposed.line_begin_indexes[((SparseMatrix)o).val_columns[i]]+vector[((SparseMatrix)o).val_columns[i]]]=((SparseMatrix)o).values[i];
-          transposed.val_columns[transposed.line_begin_indexes[((SparseMatrix)o).val_columns[i]]+(vector[((SparseMatrix)o).val_columns[i]]++)]=k;
-        }
-     */
-        k=0;
-        //проходим по первому вектору и для его значений проходим по кусочкам второго, для которых возможно произведение
+        int k=0;
+
         for (int i=0;i<values.length;i++)
         {
           if (k+1<lines&&i==line_begin_indexes[k+1])
             k++;
-          int j=((SparseMatrix) o).line_begin_indexes[val_columns[i]];
-          while (val_columns[i]+1<((SparseMatrix) o).line_begin_indexes.length&&j<((SparseMatrix) o).line_begin_indexes[val_columns[i]+1]||val_columns[i]+1==((SparseMatrix) o).line_begin_indexes.length&&j<((SparseMatrix) o).values.length)
-            mult_res.matrix[k][((SparseMatrix) o).val_columns[j]]+=values[i]*((SparseMatrix) o).values[j++];
+          int j=so.line_begin_indexes[val_columns[i]];
+          while (j<so.line_begin_indexes[val_columns[i]+1])
+            mult_res.matrix[k][so.val_columns[j]]+=values[i]*so.values[j++];
         }
         return  mult_res;
       }
@@ -146,8 +96,6 @@ public class SparseMatrix implements Matrix
       if(((DenseMatrix) o).lines==columns)
       {
         DenseMatrix mult_res=new DenseMatrix(lines,((DenseMatrix) o).columns);
-      //  DenseMatrix transposed = new DenseMatrix(((DenseMatrix) o).columns, ((DenseMatrix) o).lines);
-
         int k=0;
 
         for (int i=0;i< values.length;i++)
@@ -206,7 +154,7 @@ public class SparseMatrix implements Matrix
           for (int j=0;j<((DenseMatrix) o).columns;j++)
 
             if(((DenseMatrix) o).matrix[i][j]!=0)
-              if (l<values.length&&((DenseMatrix) o).matrix[i][j]==values[l])
+              if (l<values.length&&values[l]==((DenseMatrix) o).matrix[i][j])
                 l++;
               else
                 return false;
@@ -234,18 +182,17 @@ public class SparseMatrix implements Matrix
       {
         if (k+1<lines&&l==line_begin_indexes[k+1])
           k++;
+
         if(l<values.length&&val_columns[l]==j&&k==i)
         {
-          if (values[l]-(int)values[l]==0)
+          if (values[l]-Math.floor(values[l])==0)
             s=s.concat(format.format(values[l])+" ");
           else
             s=s.concat(values[l]+" ");
           l++;
         }
         else
-        {
           s=s.concat("0 ");
-        }
 
       }
       s=s.substring(0,s.length()-1);

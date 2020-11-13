@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -75,8 +77,8 @@ public class MatrixTest
     m1.lines=5;
     m1.columns=7;
     m1.val_columns= new int[]{0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 2, 3, 4, 6};
-    m1.values=new double[]{1,5,76,4,19,-25,31,23,7,29,64,91,55,23,8,1,84,47,2,1,16,-73,57,6,1,58,3,43,-5,-6,12,-26};
-    m1.line_begin_indexes=new int[]{0,7,14,20,27};
+    m1.values=new double[] {1.,5.,76.,4.,19.,-25.,31.,23.,7.,29.,64.,91.,55.,23.,8.,1.,84.,47.,2.,1.,16.,-73.,57.,6.,1.,58.,3.,43.,-5.,-6.,12.,-26.};
+    m1.line_begin_indexes=new int[]{0,7,14,20,27,32};
     assertEquals(m1,m2);
   }
 

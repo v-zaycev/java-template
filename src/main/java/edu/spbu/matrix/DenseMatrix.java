@@ -16,70 +16,24 @@ public class DenseMatrix implements Matrix
    * загружает матрицу из файла
    * @param fileName
    */
-  /*
+
   public DenseMatrix(String fileName) throws Exception
   {
     BufferedReader reader = new BufferedReader (new FileReader(fileName));
-    String s;
-    ArrayList<double[]> matrix= new ArrayList<double[]>();
+    String elements[], s;
+    ArrayList<double[]> matrix= new ArrayList<>();
     double[] current_string;
     int i=0;
 
     while (reader.ready())
     {
       s=reader.readLine();
-      String[] elements=s.split(" ");
-      current_string=new double[elements.length];
-      for(int j=0;j<elements.length;j++)
-        current_string[j]=Double.parseDouble(elements[j]);
-      matrix.add(current_string);
-      i++;
-    }
-
-    lines=i;
-    columns= matrix.get(0).length;
-    this.matrix=new double[i][];
-    for (int j=0;j< matrix.size();j++)
-      this.matrix[j]=matrix.get(j);
-    reader.close();
-  }
-  */
-
-  public DenseMatrix(String fileName) throws Exception
-  {
-    BufferedReader reader = new BufferedReader (new FileReader(fileName));
-    String s, number= new String();
-    ArrayList<String> elements;
-    ArrayList<double[]> matrix= new ArrayList<double[]>();
-    double[] current_string;
-    int i=0;
-
-    while (reader.ready())
-    {
-      s=reader.readLine();
-      elements=new ArrayList<String>();
-      char[] str=s.toCharArray();
-      for (char j: str)
+      elements=s.split(" ");
+      if (elements.length>0)
       {
-        if (j!=' ')
-          number=number.concat(String.valueOf(j));
-        else
-          if (number.length()>0)
-          {
-            elements.add(number);
-            number=new String();
-          }
-      }
-      if (number.length()>0)
-      {
-        elements.add(number);
-        number=new String();
-      }
-      if (elements.size()>0)
-      {
-        current_string=new double[elements.size()];
-        for(int j=0;j<elements.size();j++)
-          current_string[j]=Double.parseDouble(elements.get(j));
+        current_string=new double[elements.length];
+        for(int j=0;j<elements.length;j++)
+          current_string[j]=Double.parseDouble(elements[j]);
         matrix.add(current_string);
         i++;
       }
@@ -126,23 +80,27 @@ public class DenseMatrix implements Matrix
     }
     if (o instanceof SparseMatrix)
     {
-      if (lines!=((SparseMatrix) o).columns)
+      SparseMatrix so=(SparseMatrix)o;
+      if (lines!=so.columns)
         return null;
 
-      DenseMatrix matrix=new DenseMatrix(lines, ((SparseMatrix) o).columns);
-
-      int k=0;
+      DenseMatrix matrix=new DenseMatrix(lines, so.columns);
+      DenseMatrix transposed=new DenseMatrix(columns,lines);
       for (int i=0;i<lines;i++)
         for (int j=0;j<columns;j++)
-          if (this.matrix[i][j]!=0)
-          {
-            k=((SparseMatrix) o).line_begin_indexes[j];
-            while(j+1<((SparseMatrix) o).line_begin_indexes.length&&k<((SparseMatrix) o).line_begin_indexes[j+1]||j+1==((SparseMatrix) o).line_begin_indexes.length&&k<((SparseMatrix) o).values.length)
-              matrix.matrix[i][((SparseMatrix) o).val_columns[k]]+=((SparseMatrix) o).values[k++]*this.matrix[i][j];
-          }
+          transposed.matrix[j][i]=this.matrix[i][j];
+
+      int k=0;
+
+      for (int i=0;i<so.values.length;i++)
+      {
+        if (so.line_begin_indexes[k+1]==i)
+          k++;
+        for (int j=0;j<lines;j++)
+          matrix.matrix[j][so.val_columns[i]]+=so.values[i]*transposed.matrix[k][j];
+      }
       return matrix;
     }
-
     return null;
   }
 
