@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 /**
  * Плотная матрица
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 public class DenseMatrix implements Matrix
 {
   double[][] matrix;
-  int lines, columns;
+  public int lines, columns;
   /**
    * загружает матрицу из файла
    * @param fileName
@@ -104,17 +105,48 @@ public class DenseMatrix implements Matrix
     return null;
   }
 
+
+  public class Line_mult  implements Runnable
+  {
+    int m;
+    DenseMatrix d;
+    DenseMatrix res;
+    Line_mult (int i,DenseMatrix res,DenseMatrix d)
+    {
+      m=i;
+      this.d=d;
+      this.res=res;
+    }
+
+    @Override
+    public void run()
+    {
+      for (int i=0;i<columns;i++)
+        for (int j=0;j<d.columns;j++)
+          res.matrix[m][j]+=matrix[m][i]*d.matrix[i][j];
+      return;
+    }
+  }
   /**
    * многопоточное умножение матриц
    *
    * @param o
    * @return
    */
-  @Override public Matrix dmul(Matrix o)
+  @Override public Matrix dmul(Matrix o) throws InterruptedException
   {
-    return null;
-  }
+    DenseMatrix d=(DenseMatrix) o;
+    DenseMatrix result=new DenseMatrix(lines,d.columns);
+    ExecutorService pool= Executors.newWorkStealingPool();
+    for (int i=0;i<lines;i++)
+    {
+      pool.submit(new Line_mult(i,result,d));
+    }
 
+    pool.shutdown();
+    pool.awaitTermination(100,TimeUnit.SECONDS);
+    return result;
+  }
   /**
    * спавнивает с обоими вариантами
    * @param o
@@ -164,6 +196,6 @@ public class DenseMatrix implements Matrix
   {
     DenseMatrix m1= new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
     DenseMatrix m2= new DenseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m2.txt");
-    System.out.println(m1.mul(m2).toString());
+    System.out.println(m1.dmul(m2).toString());
   }
 }

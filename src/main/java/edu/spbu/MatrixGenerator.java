@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Random;
 import java.util.stream.Collectors;
+import edu.spbu.matrix.*;
 
 public class MatrixGenerator
 {
@@ -15,7 +16,7 @@ public class MatrixGenerator
 
   public static final String MATRIX1_NAME = "m1.txt";
   public static final String MATRIX2_NAME = "m2.txt";
-  public static final int SIZE = 2000;
+  public static final int SIZE = 4000;
 
   private final int emptyRowFraction;
   private final int size;
@@ -32,7 +33,7 @@ public class MatrixGenerator
     emptyRow = Collections.nCopies(size, "0").stream().collect(Collectors.joining(" "));
   }
 
-  public static void main(String args[])
+  public static void main(String args[]) throws Exception
   {
     try
     {
@@ -46,28 +47,28 @@ public class MatrixGenerator
     }
   }
 
-  private static void testPerformance()
+  private static void testPerformance() throws Exception
   {
     // Uncomment the code to Test your library
-    /*
+
     System.out.println("Starting loading dense matrices");
-    Matrix m1 = new DenseMatrix(MATRIX1_NAME);
+    DenseMatrix m1 = new DenseMatrix(MATRIX1_NAME);
     System.out.println("1 loaded");
-    Matrix m2 = new DenseMatrix(MATRIX2_NAME);
+    DenseMatrix m2 = new DenseMatrix(MATRIX2_NAME);
     System.out.println("2 loaded");
     long start = System.currentTimeMillis();
-    m1.mul(m2);
+    m1.dmul(m2);
     System.out.println("Dense Matrix time: " +(System.currentTimeMillis() - start));
 
     System.out.println("Starting loading sparse matrices");
-    m1 = new SparseMatrix(MATRIX1_NAME);
+    SparseMatrix m11 = new SparseMatrix(MATRIX1_NAME);
     System.out.println("1 loaded");
-    m2 = new SparseMatrix(MATRIX2_NAME);
+    SparseMatrix m22 = new SparseMatrix(MATRIX2_NAME);
     System.out.println("2 loaded");
     start = System.currentTimeMillis();
-    m1.mul(m2);
+    m11.mul(m22);
     System.out.println("Sparse Matrix time: " +(System.currentTimeMillis() - start));
-    */
+
   }
 
   public void generate() throws IOException

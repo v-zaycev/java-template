@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.*;
+
 
 /**
  * Разряженная матрица
@@ -11,10 +13,11 @@ import java.util.ArrayList;
 
 public class SparseMatrix implements Matrix
 {
-  double values[];
-  int val_columns[];
-  int lines, columns;
-  int line_begin_indexes[];
+  public double[] values;
+  int[] val_columns;
+  public int lines, columns;
+  int[] line_begin_indexes;
+
   /**
    * загружает матрицу из файла
    * @param fileName
@@ -113,15 +116,48 @@ public class SparseMatrix implements Matrix
     return null;
   }
 
+  public class Line_mult  implements Runnable
+  {
+    int m;
+    SparseMatrix s;
+    DenseMatrix res;
+    Line_mult (int i,DenseMatrix res,SparseMatrix s)
+    {
+      m=i;
+      this.s=s;
+      this.res=res;
+    }
+
+    @Override
+    public void run()
+    {
+      for (int i=line_begin_indexes[m];i<line_begin_indexes[m+1];i++)
+      {
+        for(int j=s.line_begin_indexes[val_columns[i]];j<s.line_begin_indexes[val_columns[i]+1];j++)
+          res.matrix[m][s.val_columns[j]]+=values[i]*s.values[j];
+      }
+      return;
+    }
+  }
   /**
    * многопоточное умножение матриц
    *
    * @param o
    * @return
    */
-  @Override public Matrix dmul(Matrix o)
+  @Override public Matrix dmul(Matrix o) throws InterruptedException
   {
-    return null;
+    SparseMatrix so=(SparseMatrix)o;
+    DenseMatrix result=new DenseMatrix(lines,so.columns);
+    ExecutorService pool= Executors.newWorkStealingPool();
+    for (int i=0;i<lines;i++)
+    {
+      pool.submit(new Line_mult(i,result,so));
+    }
+
+    pool.shutdown();
+    pool.awaitTermination(100,TimeUnit.SECONDS);
+      return result;
   }
 
   /**
@@ -206,6 +242,6 @@ public class SparseMatrix implements Matrix
   {
     SparseMatrix m1= new SparseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m1.txt");
     SparseMatrix m2= new SparseMatrix(".\\src\\main\\java\\edu\\spbu\\matrix\\m2.txt");
-    System.out.println(m1.mul(m2).toString());
+    System.out.println(m1.dmul(m2).toString());
   }
 }

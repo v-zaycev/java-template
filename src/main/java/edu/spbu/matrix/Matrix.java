@@ -1,5 +1,7 @@
 package edu.spbu.matrix;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  *
  */
@@ -18,6 +20,6 @@ public interface Matrix
    * @param o
    * @return
    */
-  Matrix dmul(Matrix o);
+  Matrix dmul(Matrix o) throws ExecutionException, InterruptedException;
 
 }
